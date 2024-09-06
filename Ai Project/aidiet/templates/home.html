@@ -1,0 +1,182 @@
+<h1 align="center">Welcome !! {{username}}</h1>
+
+<style>
+    :root {
+        --primary-color: #3498db;
+        --secondary-color: #2c3e50;
+        --background-color: #ecf0f1;
+        --text-color: #34495e;
+        --success-color: #2ecc71;
+        --warning-color: #f39c12;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: var(--text-color);
+        background-color: var(--background-color);
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    header {
+        background-color: var(--primary-color);
+        color: white;
+        text-align: center;
+        padding: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    h1, h2 {
+        color: var(--secondary-color);
+    }
+
+    .card {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    form {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+        flex-grow: 1;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+    button {
+        padding: 10px 20px;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+        background-color: #2980b9;
+    }
+
+    ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    li {
+        background-color: white;
+        margin-bottom: 10px;
+        padding: 15px;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease;
+    }
+
+    li:hover {
+        transform: translateY(-2px);
+    }
+
+    .book-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .completed {
+        color: var(--success-color);
+    }
+
+    .incomplete {
+        color: var(--warning-color);
+    }
+
+    .icon {
+        margin-right: 10px;
+    }
+
+    #bookCount {
+        font-size: 0.9rem;
+        color: #7f8c8d;
+        margin-top: 10px;
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 10px;
+        }
+
+        form {
+            flex-direction: column;
+        }
+
+        input[type="text"], button {
+            width: 100%;
+        }
+    }
+</style>
+<div class="container">
+    <div class="card">
+        <h2><i class="fas fa-plus-circle icon"></i>Add a New Book</h2>
+        <form method="POST" action="AddNewBook/">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="text" name="BookName" placeholder="Enter book name" required="required">
+            <button type="submit"><i class="fas fa-plus icon"></i>Add Book</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2><i class="fas fa-check-circle icon"></i>Completed Books</h2>
+        <ul id="completedList">
+            {% for book in completed_books %}
+                <li class="completed"><i class="fas fa-book-reader icon"></i>{{ book.name }}</li>
+            {% empty %}
+                <li>No completed books yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2><i class="fas fa-clock icon"></i>Incomplete Books</h2>
+        <ul id="incompleteList">
+            {% for book in incomplete_books %}
+                <li class="book-item incomplete">
+                    <span><i class="fas fa-book icon"></i>{{ book.name }}</span>
+                    <form method="POST" action="{% url 'MarkAsCompleted' book.id %}">
+                        {% csrf_token %}
+                        <button type="submit"><i class="fas fa-check icon"></i>Mark as Completed</button>
+                    </form>
+                </li>
+            {% empty %}
+                <li>No incomplete books.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div id="bookCount"></div>
+
+    <form method="POST" action="Recommend/">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Recommend Some Books</button>
+    </form>
+
+    {% if result %}
+        <h2>Result:</h2>
+        <h3>{{ result }}</h3>
+    {% endif %}
+</div>
